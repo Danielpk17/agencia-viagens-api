@@ -28,14 +28,14 @@ persistidos em **PostgreSQL** com **Spring Data JPA**, e a API passou a contar c
 | Spring Boot | 3.3.4 |
 | Spring Web, Spring Data JPA, Spring Security, Bean Validation | starters do Boot 3.3.4 |
 | PostgreSQL | 14 ou superior |
-| Maven | 3.9 ou superior |
+| Maven | 3.9 ou superior, ou o wrapper `./mvnw` incluido no projeto |
 | springdoc-openapi (Swagger UI) | 2.6.0 |
 
 Verifique o ambiente antes de iniciar:
 
 ```bash
 java -version
-mvn -version
+./mvnw -version
 psql --version
 ```
 
@@ -143,8 +143,11 @@ spring.jpa.show-sql=true
 Exemplo alterando credenciais sem editar o arquivo:
 
 ```bash
-DB_USER=agencia_app DB_PASSWORD=agencia123 mvn spring-boot:run
+DB_USER=agencia_app DB_PASSWORD=agencia123 ./mvnw spring-boot:run
 ```
+
+O usuario `agencia_app` e criado pelo script `scripts/01_criar_banco.sql`, que tambem concede as permissoes
+no schema `public` exigidas pelo PostgreSQL 15 e versoes seguintes para que o Hibernate consiga criar as tabelas.
 
 ## Como executar
 
@@ -154,13 +157,16 @@ cd agencia-viagens-api
 
 docker compose up -d
 
-mvn clean spring-boot:run
+./mvnw clean spring-boot:run
 ```
+
+No Windows use `mvnw.cmd` no lugar de `./mvnw`. Quem ja tem o Maven instalado pode trocar `./mvnw` por `mvn`.
+O wrapper dispensa a instalacao previa do Maven: ele baixa a versao correta na primeira execucao.
 
 Gerando e executando o jar:
 
 ```bash
-mvn clean package
+./mvnw clean package
 java -jar target/agencia-viagens-api-2.0.0.jar
 ```
 
