@@ -1,0 +1,107 @@
+@host = http://localhost:8080
+@admin = Basic YWRtaW46YWRtaW4xMjM=
+@user = Basic bWFyaWE6dXNlcjEyMw==
+
+### Vitrine publica de destinos, nao exige autenticacao
+GET {{host}}/api/publico/destinos
+
+### Tentativa sem credenciais, retorna 401
+GET {{host}}/api/destinos
+
+### Login e verificacao do perfil autenticado
+POST {{host}}/api/auth/login
+Authorization: {{admin}}
+
+### Listagem completa com perfil USER
+GET {{host}}/api/destinos
+Authorization: {{user}}
+
+### Busca por termo
+GET {{host}}/api/destinos?busca=serra
+Authorization: {{user}}
+
+### Filtro por pais
+GET {{host}}/api/destinos?pais=Brasil
+Authorization: {{user}}
+
+### Cadastro de destino, apenas ADMIN
+POST {{host}}/api/destinos
+Authorization: {{admin}}
+Content-Type: application/json
+
+{
+  "nome": "Ilha Grande",
+  "pais": "Brasil",
+  "cidade": "Angra dos Reis",
+  "descricao": "Trilhas e praias sem transito de carros",
+  "precoMedio": 2890.00,
+  "duracaoDias": 5,
+  "ativo": true
+}
+
+### Cadastro com perfil USER, retorna 403
+POST {{host}}/api/destinos
+Authorization: {{user}}
+Content-Type: application/json
+
+{
+  "nome": "Teste Negado",
+  "pais": "Brasil",
+  "cidade": "Teste",
+  "precoMedio": 1000.00,
+  "duracaoDias": 3
+}
+
+### Atualizacao de destino, apenas ADMIN
+PUT {{host}}/api/destinos/1
+Authorization: {{admin}}
+Content-Type: application/json
+
+{
+  "nome": "Fernando de Noronha",
+  "pais": "Brasil",
+  "cidade": "Fernando de Noronha",
+  "descricao": "Pacote atualizado com mergulho guiado",
+  "precoMedio": 8190.00,
+  "duracaoDias": 6,
+  "ativo": true
+}
+
+### Avaliacao de destino por usuario autenticado
+POST {{host}}/api/destinos/1/avaliacoes
+Authorization: {{user}}
+Content-Type: application/json
+
+{
+  "nota": 5,
+  "comentario": "Viagem impecavel do inicio ao fim"
+}
+
+### Avaliacoes de um destino
+GET {{host}}/api/destinos/1/avaliacoes
+Authorization: {{user}}
+
+### Exclusao de avaliacao, apenas ADMIN
+DELETE {{host}}/api/avaliacoes/1
+Authorization: {{admin}}
+
+### Cadastro de usuario, apenas ADMIN
+POST {{host}}/api/usuarios
+Authorization: {{admin}}
+Content-Type: application/json
+
+{
+  "username": "joao",
+  "senha": "joao123456",
+  "nome": "Joao Cliente",
+  "email": "joao@agenciaviagens.com",
+  "perfis": ["USER"]
+}
+
+### Listagem de usuarios, apenas ADMIN
+GET {{host}}/api/usuarios
+Authorization: {{admin}}
+
+### Exclusao de destino, apenas ADMIN
+DELETE {{host}}/api/destinos/5
+Authorization: {{admin}}
