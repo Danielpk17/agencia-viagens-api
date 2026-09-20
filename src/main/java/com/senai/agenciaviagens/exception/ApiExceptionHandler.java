@@ -1,6 +1,8 @@
 package com.senai.agenciaviagens.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(RecursoNaoEncontradoException.class)
     public ResponseEntity<ErroResponse> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException excecao,
@@ -48,8 +52,9 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResponse> tratarErroInesperado(Exception excecao, HttpServletRequest requisicao) {
+        LOG.error("Erro inesperado ao processar {} {}", requisicao.getMethod(), requisicao.getRequestURI(), excecao);
         return montar(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno",
-                excecao.getMessage(), requisicao, null);
+                "Ocorreu um erro inesperado ao processar a requisicao", requisicao, null);
     }
 
     private ResponseEntity<ErroResponse> montar(HttpStatus status, String erro, String mensagem,
