@@ -83,7 +83,7 @@ public class DestinoService {
                     throw new RegraNegocioException("Ja existe outro destino cadastrado com o nome " + requisicao.nome());
                 });
         destinoMapper.aplicar(requisicao, destino);
-        return destinoMapper.paraResposta(destinoRepository.save(destino));
+        return destinoMapper.paraResposta(destinoRepository.saveAndFlush(destino));
     }
 
     @Transactional
