@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agencia-viagens-db
+    environment:
+      POSTGRES_DB: agencia_viagens
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - agencia_viagens_data:/var/lib/postgresql/data
+
+volumes:
+  agencia_viagens_data:
