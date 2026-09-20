@@ -56,6 +56,15 @@ public class DestinoService {
         return destinoMapper.paraResposta(obterEntidade(id));
     }
 
+    @Transactional(readOnly = true)
+    public DestinoResponse buscarAtivoPorId(Long id) {
+        Destino destino = obterEntidade(id);
+        if (!destino.isAtivo()) {
+            throw new RecursoNaoEncontradoException("Destino nao encontrado para o id " + id);
+        }
+        return destinoMapper.paraResposta(destino);
+    }
+
     @Transactional
     public DestinoResponse criar(DestinoRequest requisicao) {
         if (destinoRepository.existsByNomeIgnoreCase(requisicao.nome().trim())) {

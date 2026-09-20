@@ -27,6 +27,6 @@ public class DestinoPublicoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DestinoResponse> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(destinoService.buscarPorId(id));
+        return ResponseEntity.ok(destinoService.buscarAtivoPorId(id));
     }
 }
