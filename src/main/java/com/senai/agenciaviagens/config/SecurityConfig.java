@@ -1,8 +1,13 @@
 package com.senai.agenciaviagens.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.senai.agenciaviagens.exception.ErroResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,6 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +39,12 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/error"
     };
+
+    private final ObjectMapper objectMapper;
+
+    public SecurityConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -69,25 +83,30 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (requisicao, resposta, excecao) -> {
-            resposta.setStatus(401);
-            resposta.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            resposta.setCharacterEncoding("UTF-8");
-            resposta.getWriter().write("{\"status\":401,\"erro\":\"Nao autenticado\","
-                    + "\"mensagem\":\"Informe usuario e senha validos no cabecalho Authorization\","
-                    + "\"caminho\":\"" + requisicao.getRequestURI() + "\"}");
-        };
+        return (requisicao, resposta, excecao) -> escrever(requisicao, resposta,
+                HttpStatus.UNAUTHORIZED, "Nao autenticado",
+                "Informe usuario e senha validos no cabecalho Authorization");
     }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        return (requisicao, resposta, excecao) -> {
-            resposta.setStatus(403);
-            resposta.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            resposta.setCharacterEncoding("UTF-8");
-            resposta.getWriter().write("{\"status\":403,\"erro\":\"Acesso negado\","
-                    + "\"mensagem\":\"O perfil autenticado nao possui permissao para esta operacao\","
-                    + "\"caminho\":\"" + requisicao.getRequestURI() + "\"}");
-        };
+        return (requisicao, resposta, excecao) -> escrever(requisicao, resposta,
+                HttpStatus.FORBIDDEN, "Acesso negado",
+                "O perfil autenticado nao possui permissao para esta operacao");
+    }
+
+    private void escrever(HttpServletRequest requisicao, HttpServletResponse resposta,
+                          HttpStatus status, String erro, String mensagem) throws IOException {
+        resposta.setStatus(status.value());
+        resposta.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        resposta.setCharacterEncoding("UTF-8");
+        ErroResponse corpo = new ErroResponse(
+                LocalDateTime.now(),
+                status.value(),
+                erro,
+                mensagem,
+                requisicao.getRequestURI(),
+                null);
+        objectMapper.writeValue(resposta.getWriter(), corpo);
     }
 }
