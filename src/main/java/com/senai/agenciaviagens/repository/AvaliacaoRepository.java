@@ -12,6 +12,4 @@ public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
     List<Avaliacao> findByDestinoIdOrderByCriadoEmDesc(Long destinoId);
 
     boolean existsByDestinoIdAndUsuarioId(Long destinoId, Long usuarioId);
-
-    long countByDestinoId(Long destinoId);
 }
